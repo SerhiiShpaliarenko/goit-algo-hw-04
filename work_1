@@ -1,0 +1,85 @@
+import timeit
+import random
+
+# --- 1. Сортування вставками (Insertion Sort) ---
+def insertion_sort(lst):
+    for i in range(1, len(lst)):
+        key = lst[i]
+        j = i - 1
+        while j >= 0 and key < lst[j]:
+            lst[j + 1] = lst[j]
+            j -= 1
+        lst[j + 1] = key
+    return lst
+
+# --- 2. Сортування злиттям (Merge Sort) ---
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+
+    mid = len(arr) // 2
+    left_half = arr[:mid]
+    right_half = arr[mid:]
+
+    return merge(merge_sort(left_half), merge_sort(right_half))
+
+def merge(left, right):
+    merged = []
+    left_index = 0
+    right_index = 0
+
+    # Сполучаємо менші елементи
+    while left_index < len(left) and right_index < len(right):
+        if left[left_index] <= right[right_index]:
+            merged.append(left[left_index])
+            left_index += 1
+        else:
+            merged.append(right[right_index])
+            right_index += 1
+
+    # Додаємо залишки
+    while left_index < len(left):
+        merged.append(left[left_index])
+        left_index += 1
+
+    while right_index < len(right):
+        merged.append(right[right_index])
+        right_index += 1
+
+    return merged
+
+# --- 3. Timsort (Вбудований в Python) ---
+# Використовуємо стандартну функцію sorted() або list.sort()
+
+# --- Тестування ---
+if __name__ == "__main__":
+    data_sizes = [100, 1000, 10000]
+    print(f"{'Algorithm':<20} | {'Size':<10} | {'Time (sec)':<15}")
+    print("-" * 50)
+
+    for size in data_sizes:
+        # Генеруємо випадковий набір даних
+        # Робимо копії для кожного алгоритму, щоб умови були рівні
+        data_original = [random.randint(0, 100_000) for _ in range(size)]
+        
+        # 1. Тест Insertion Sort
+        # На великих масивах Insertion Sort дуже повільний, тому для 10000
+        # можна очікувати затримку.
+        if size <= 10000: 
+            data_for_insertion = data_original[:]
+            time_insertion = timeit.timeit(lambda: insertion_sort(data_for_insertion), number=1)
+            print(f"{'Insertion Sort':<20} | {size:<10} | {time_insertion:.5f}")
+        else:
+            print(f"{'Insertion Sort':<20} | {size:<10} | {'skipped (too slow)'}")
+
+        # 2. Тест Merge Sort
+        data_for_merge = data_original[:]
+        time_merge = timeit.timeit(lambda: merge_sort(data_for_merge), number=1)
+        print(f"{'Merge Sort':<20} | {size:<10} | {time_merge:.5f}")
+
+        # 3. Тест Timsort (Python built-in)
+        data_for_timsort = data_original[:]
+        time_timsort = timeit.timeit(lambda: sorted(data_for_timsort), number=1)
+        print(f"{'Timsort (Built-in)':<20} | {size:<10} | {time_timsort:.5f}")
+        
+        print("-" * 50)
